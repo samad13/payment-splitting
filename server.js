@@ -51,7 +51,7 @@ app.post('/split-payments/compute', (req, res) => {
 
             }
             balance - splitAmount;
-            // revisit this
+
             totalSplitAmount += splitAmount;
 
 
@@ -73,7 +73,7 @@ app.post('/split-payments/compute', (req, res) => {
 
             splitBreakdown.push({
                 SplitEntityId: splitEntity.SplitEntityId,
-                Amount: splitAmount, //chek this
+                Amount: splitAmount,
             });
         }
 
