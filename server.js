@@ -38,6 +38,7 @@ app.post('/split-payments/compute', (req, res) => {
 
                 splitAmount = (splitEntity.SplitValue / 100) * balance;
                 balance - splitAmount
+
             } else if (splitEntity.SplitType === 'RATIO') {
                 const totalRatio = SplitInfo
                     .filter(entity => entity.SplitType === 'RATIO')
@@ -49,11 +50,11 @@ app.post('/split-payments/compute', (req, res) => {
 
 
             }
-
+            balance - splitAmount;
             // revisit this
             totalSplitAmount += splitAmount;
 
-            //balance -= splitAmount;
+
             if (totalSplitAmount > Amount) {
                 return res.status(400).json({ error: 'Sum of split amounts cannot be greater than the transaction amount.' });
             }
