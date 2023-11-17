@@ -5,6 +5,9 @@ const port = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.get('/split-payments/compute', (req, res) => {
+    res.send('welcome to sendstack')
+})
 
 app.post('/split-payments/compute', (req, res) => {
     try {
