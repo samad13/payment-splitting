@@ -12,15 +12,14 @@ app.post('/split-payments/compute', (req, res) => {
 
         const { ID, Amount, Currency, CustomerEmail, SplitInfo } = req.body;
 
+        if (SplitInfo.length < 1 || SplitInfo.length > 20) {
+            return res.status(400).json({ error: 'SplitInfo must contain between 1 and 20 entities.' });
+        }
+
         SplitInfo.sort((a, b) => {
             const order = { FLAT: 1, PERCENTAGE: 2, RATIO: 3 };
             return order[a.SplitType] - order[b.SplitType];
         });
-
-        // Constraints
-        if (SplitInfo.length < 1 || SplitInfo.length > 20) {
-            return res.status(400).json({ error: 'SplitInfo must contain between 1 and 20 entities.' });
-        }
 
         let balance = Amount;
 
@@ -29,30 +28,32 @@ app.post('/split-payments/compute', (req, res) => {
 
         const splitBreakdown = [];
 
-        // Iterate over each split entity in SplitInfo
         for (const splitEntity of SplitInfo) {
 
             let splitAmount;
             if (splitEntity.SplitType === 'FLAT') {
                 splitAmount = splitEntity.SplitValue;
-                balance -= splitAmount;
+                balance - splitAmount
             } else if (splitEntity.SplitType === 'PERCENTAGE') {
 
                 splitAmount = (splitEntity.SplitValue / 100) * balance;
-                balance -= splitAmount;
+                balance - splitAmount
             } else if (splitEntity.SplitType === 'RATIO') {
                 const totalRatio = SplitInfo
                     .filter(entity => entity.SplitType === 'RATIO')
                     .reduce((total, entity) => total + entity.SplitValue, 0);
 
                 splitAmount = (splitEntity.SplitValue / totalRatio) * balance;
-                balance -= splitAmount;
+                balance - splitAmount
+
+
+
             }
 
             // revisit this
             totalSplitAmount += splitAmount;
 
-
+            //balance -= splitAmount;
             if (totalSplitAmount > Amount) {
                 return res.status(400).json({ error: 'Sum of split amounts cannot be greater than the transaction amount.' });
             }
@@ -71,7 +72,7 @@ app.post('/split-payments/compute', (req, res) => {
 
             splitBreakdown.push({
                 SplitEntityId: splitEntity.SplitEntityId,
-                Amount: splitAmount,
+                Amount: splitAmount, //chek this
             });
         }
 
